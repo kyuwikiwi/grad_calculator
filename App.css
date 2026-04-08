@@ -399,11 +399,11 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   letter-spacing: .04em;
   flex-shrink: 0;
 }
-.format-badge--pdf {
-  background: #FEE2E2;
-  color: #991B1B;
+.format-badge--xslx {
+  background: #DCFCE7;
+  color: #166534;
 }
-.format-badge--png {
+.format-badge--xls {
   background: #DBEAFE;
   color: #1E40AF;
 }
@@ -549,6 +549,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   border-radius: 99px;
   transition: width .8s cubic-bezier(.4,0,.2,1);
 }
+.progress-exceeded {color: #7F77DD; font-weight: 600;}
+
 .bar--green { background: #18A679; }
 .bar--amber { background: #EF9F27; }
 .bar--red   { background: #E24B4A; }
