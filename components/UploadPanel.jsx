@@ -1,23 +1,20 @@
-// components/UploadPanel.jsx
-// props:
-//   settings     : { studentId, track }
-//   onParsed     : (courses) => void
-//   onCalculated : (result) => void  — Day 3에서 사용
+// src/components/UploadPanel.jsx
 
 import { useState, useRef } from 'react'
+import { parseFile, getCourses } from '../api/api'
 
-const ACCEPTED_TYPES = ['application/pdf', 'image/png']
-const ACCEPTED_EXT   = '.pdf,.png'
+const ACCEPTED_EXT = '.xlsx,.xls'
 
 export default function UploadPanel({ settings, onParsed }) {
   const [file,     setFile]     = useState(null)
-  const [status,   setStatus]   = useState('idle') // idle | dragging | uploading | done | error
+  const [status,   setStatus]   = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const inputRef = useRef()
 
   const validate = (f) => {
-    if (!ACCEPTED_TYPES.includes(f.type)) {
-      setErrorMsg('PDF 또는 PNG 파일만 업로드할 수 있어요.')
+    const ext = f.name.split('.').pop().toLowerCase()
+    if (!['xlsx', 'xls'].includes(ext)) {
+      setErrorMsg('엑셀 파일(.xlsx, .xls)만 업로드할 수 있어요.')
       setStatus('error')
       return false
     }
@@ -29,24 +26,31 @@ export default function UploadPanel({ settings, onParsed }) {
     return true
   }
 
-  const handleFile = (f) => {
+  const handleFile = async (f) => {
     if (!validate(f)) return
     setFile(f)
     setStatus('uploading')
     setErrorMsg('')
 
-    // 백엔드 연결 전 — 2초 시뮬레이션
-    // Day 3에서 실제 API 호출로 교체:
-    // const res = await api.parseFile(f, settings)
-    // onParsed(res.courses)
-    setTimeout(() => {
+    try {
+      // 1. 파싱 + DB 저장
+      const parsed = await parseFile(f)
+
+      // 2. 저장된 과목 조회 (student_id는 파싱 응답에서 가져옴)
+      const studentId = parsed.student_id
+      const courses = await getCourses(studentId)
+
       setStatus('done')
-    }, 2000)
+      onParsed(courses)  // App.jsx로 실제 과목 목록 전달
+    } catch (e) {
+      setErrorMsg('서버 연결에 실패했어요. 백엔드가 켜져 있는지 확인해주세요.')
+      setStatus('error')
+    }
   }
 
-  const onDragOver  = (e) => { e.preventDefault(); setStatus('dragging') }
-  const onDragLeave = ()  => setStatus(file ? 'done' : 'idle')
-  const onDrop      = (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }
+  const onDragOver    = (e) => { e.preventDefault(); setStatus('dragging') }
+  const onDragLeave   = ()  => setStatus(file ? 'done' : 'idle')
+  const onDrop        = (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }
   const onInputChange = (e) => { const f = e.target.files[0]; if (f) handleFile(f) }
 
   const reset = () => {
@@ -58,14 +62,13 @@ export default function UploadPanel({ settings, onParsed }) {
     <div className="panel upload-panel">
 
       <div className="panel-hero">
-        <h1 className="panel-title">성적표를 올려주세요 📄</h1>
+        <h1 className="panel-title">성적표를 올려주세요 📊</h1>
         <p className="panel-desc">
-          종합정보시스템에서 성적표를 저장한 뒤 올려주세요.<br />
+          종합정보시스템에서 성적표를 엑셀로 저장한 뒤 올려주세요.<br />
           <strong>{settings.studentId}학번 {settings.track}과정</strong> 기준으로 분석할게요.
         </p>
       </div>
 
-      {/* 드롭존 */}
       <div
         className={`dropzone dropzone--${status}`}
         onDragOver={onDragOver}
@@ -85,14 +88,15 @@ export default function UploadPanel({ settings, onParsed }) {
           <>
             <div className="dz-icon">
               <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-                <path d="M22 32V18M22 18l-7 7M22 18l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 34a8 8 0 01-1-15.9A10 10 0 0131 16a8 8 0 011 15.9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                <rect x="6" y="4" width="28" height="36" rx="3" stroke="currentColor" strokeWidth="1.8" fill="none"/>
+                <path d="M14 14h16M14 20h16M14 26h10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                <path d="M26 4v8h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </div>
             <p className="dz-title">
               {status === 'dragging' ? '여기에 놓으세요!' : '파일을 드래그하거나 클릭하세요'}
             </p>
-            <p className="dz-sub">PDF · PNG · 최대 20MB</p>
+            <p className="dz-sub">xlsx · xls · 최대 20MB</p>
           </>
         )}
 
@@ -137,19 +141,17 @@ export default function UploadPanel({ settings, onParsed }) {
         )}
       </div>
 
-      {/* 지원 형식 안내 */}
       <div className="format-guide">
         <div className="format-item">
-          <span className="format-badge format-badge--pdf">PDF</span>
-          <span className="format-text">종합정보시스템 → 성적조회 → PDF 저장</span>
+          <span className="format-badge format-badge--xlsx">XLSX</span>
+          <span className="format-text">종합정보시스템 → 성적조회 → 엑셀 저장</span>
         </div>
         <div className="format-item">
-          <span className="format-badge format-badge--png">PNG</span>
-          <span className="format-text">성적표 캡처 이미지 (전체 화면 포함)</span>
+          <span className="format-badge format-badge--xls">XLS</span>
+          <span className="format-text">구버전 엑셀 형식도 지원해요</span>
         </div>
       </div>
 
-      {/* 하단 버튼 */}
       <div className="upload-actions">
         {(status === 'idle' || status === 'dragging') && (
           <button className="btn-outline" onClick={() => inputRef.current?.click()}>
@@ -160,15 +162,10 @@ export default function UploadPanel({ settings, onParsed }) {
           <button className="btn-secondary" onClick={reset}>다시 시도</button>
         )}
         {status === 'done' && (
-          <>
-            <button className="btn-secondary" onClick={reset}>파일 다시 올리기</button>
-            <button className="btn-primary" onClick={() => onParsed([{ _parsed: true, fileName: file?.name }])}>
-              졸업요건 계산하기 →
-            </button>
-          </>
+          <button className="btn-secondary" onClick={reset}>파일 다시 올리기</button>
         )}
       </div>
 
     </div>
   )
-}6
+}
