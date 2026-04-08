@@ -14,6 +14,9 @@ export default function App() {
   const STEP_KEYS = ['settings', 'upload', 'result']
   const currentIdx = STEP_KEYS.indexOf(step)
 
+
+
+
   return (
     <div className="app-root">
       <header className="app-header">
@@ -57,8 +60,10 @@ export default function App() {
         {step === 'upload' && (
           <UploadPanel
             settings={settings}
-            onParsed={setCourses}
-            onCalculated={setResult}
+            onParsed={(parsed)=>{
+              setCourses(parsed)
+              setResult({_calculated:true})
+            }}
           />
         )}
         {step === 'result' && (
@@ -71,3 +76,4 @@ export default function App() {
     </div>
   )
 }
+
