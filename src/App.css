@@ -453,7 +453,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 /* 판정 배너 */
 .verdict-card {
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   padding: 24px 28px;
   display: flex;
   align-items: center;
@@ -592,7 +592,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   flex: 1;
   padding: 14px;
   border: 1.5px solid var(--accent-dim);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 500;
   color: var(--accent);
@@ -602,11 +602,11 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .btn-outline-accent:hover { background: #DDDDFB; }
 .result-actions .btn-secondary { padding: 14px 20px; }
 
-/*--로그인 버튼---*/
-.btn-login{
+/* ── 로그인/로그아웃 버튼 (헤더) ── */
+.btn-login {
   padding: 7px 16px;
-  border: 1.5px sold var(-accent);
-  border-radius: var(--r-md);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
   color: var(--accent);
@@ -614,11 +614,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   cursor: pointer;
   transition: background .15s;
 }
-.btn-login:hover { background: var(--acceent-light); }
+.btn-login:hover { background: var(--accent-light); }
 
-.btn-logout{
+.btn-logout {
   padding: 7px 16px;
-  border: 1.5px solid var(--r -md);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-2);
@@ -626,7 +627,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   cursor: pointer;
   transition: background .15s;
 }
-.btn-logout:hover {background: var(--border); }
+.btn-logout:hover { background: var(--border); }
 
 /* ── 로그인 모달 ──────────────────────────────────────────── */
 .modal-backdrop{
@@ -639,9 +640,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   z-index: 200;
 }
 
-.modal-box{
+.modal-box {
   background: var(--surface);
-  border-radius: var(--r -log);
+  border-radius: var(--radius-lg);
   padding: 28px 32px;
   width: 100%;
   max-width: 400px;
@@ -673,7 +674,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   width: 100%;
   padding: 10px 14px;
   border: 1.5px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   font-size: 14px;
   color: var(--text-1);
   background: var(--bg);
@@ -706,4 +707,25 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   color: var(--text-3);
   text-align: center;
   margin-top: 14px;
+}
+
+.modal-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.modal-row {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
 }

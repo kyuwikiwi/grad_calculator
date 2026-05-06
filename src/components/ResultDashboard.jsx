@@ -1,6 +1,6 @@
 // src/components/ResultDashboard.jsx
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // ── 카테고리 분류 ──────────────────────────────────────────
 function guessCategory(course) {
@@ -24,7 +24,7 @@ function calcResult(courses, track) {
   const REQ = { total: 135, major: 12, elective: 24, liberal: 43, required: 20 }
 
   const valid = courses
-    .filter(c => c.grade !== 'F')
+    .filter(c => c.grade !== 'F' && !c._placeholder)
     .map(c => ({ ...c, category: guessCategory(c) }))
 
   const sum = (filterFn) =>
@@ -79,8 +79,8 @@ function barColor(pct) {
 }
 
 function ProgressRow({ area }) {
-  const pct      = Math.min(100, Math.round((area.current / area.required) * 100))
-  const isFull   = pct >= 100
+  const pct        = Math.min(100, Math.round((area.current / area.required) * 100))
+  const isFull     = pct >= 100
   const isExceeded = area.exceeded
 
   return (
@@ -101,21 +101,117 @@ function ProgressRow({ area }) {
   )
 }
 
-// ── 메인 컴포넌트 ──────────────────────────────────────────
-export default function ResultDashboard({ courses, settings, onReset }) {
-  const [result,  setResult]  = useState(null)
-  const [loading, setLoading] = useState(true)
+// ── 수기 입력 모달 ──────────────────────────────────────────
+const CATEGORIES = ['전공필수', '전공선택', '필수교양', '일반교양']
+
+function ManualCourseModal({ onAdd, onClose }) {
+  const [form, setForm] = useState({ courseName: '', credits: '3', category: '전공선택' })
+  const inputRef = useRef()
 
   useEffect(() => {
-    const load = () => {
-      try {
-        setResult(calcResult(courses, settings.track))
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [courses, settings])
+    inputRef.current?.focus()
+    const handleKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
+  const update = (key, value) => setForm(f => ({ ...f, [key]: value }))
+
+  const submit = () => {
+    const name = form.courseName.trim()
+    if (!name) return
+    onAdd({
+      course_code:  '',
+      course_name:  name,
+      credits:      Number(form.credits),
+      category:     form.category,
+      grade:        'A',
+    })
+    onClose()
+  }
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+
+        <div className="modal-header">
+          <h2 className="modal-title">수강 중인 과목 추가</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="modal-body">
+          <p className="modal-desc">현재 수강 중인 과목을 추가하면 결과에 바로 반영돼요.</p>
+
+          <div className="field-group">
+            <label className="field-label">과목명</label>
+            <input
+              ref={inputRef}
+              className="modal-input"
+              placeholder="과목명을 입력하세요"
+              value={form.courseName}
+              onChange={e => update('courseName', e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && submit()}
+            />
+          </div>
+
+          <div className="modal-row">
+            <div className="field-group" style={{ flex: 1, marginBottom: 0 }}>
+              <label className="field-label">학점</label>
+              <select
+                className="modal-input modal-select"
+                value={form.credits}
+                onChange={e => update('credits', e.target.value)}
+              >
+                {[1, 2, 3].map(n => (
+                  <option key={n} value={n}>{n}학점</option>
+                ))}
+              </select>
+            </div>
+            <div className="field-group" style={{ flex: 2, marginBottom: 0 }}>
+              <label className="field-label">카테고리</label>
+              <select
+                className="modal-input modal-select"
+                value={form.category}
+                onChange={e => update('category', e.target.value)}
+              >
+                {CATEGORIES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>취소</button>
+          <button
+            className="btn-primary"
+            onClick={submit}
+            disabled={!form.courseName.trim()}
+          >
+            추가하기
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── 메인 컴포넌트 ──────────────────────────────────────────
+export default function ResultDashboard({ courses, settings, onReset }) {
+  const [result,          setResult]          = useState(null)
+  const [loading,         setLoading]         = useState(true)
+  const [manualCourses,   setManualCourses]   = useState([])
+  const [showManualModal, setShowManualModal] = useState(false)
+
+  useEffect(() => {
+    setResult(calcResult([...courses, ...manualCourses], settings.track))
+    setLoading(false)
+  }, [courses, settings, manualCourses])
+
+  const handleAddCourse = (course) => {
+    setManualCourses(prev => [...prev, course])
+  }
 
   if (loading) {
     return (
@@ -137,6 +233,7 @@ export default function ResultDashboard({ courses, settings, onReset }) {
           <p className="verdict-main">{verdict.message}</p>
           <p className="verdict-sub">
             {settings.studentId}학번 · {settings.track}과정 기준
+            {manualCourses.length > 0 && ` · 수기 과목 ${manualCourses.length}개 포함`}
           </p>
         </div>
       </div>
@@ -182,17 +279,38 @@ export default function ResultDashboard({ courses, settings, onReset }) {
         </div>
       )}
 
+      {/* 수기 추가 과목 목록 */}
+      {manualCourses.length > 0 && (
+        <div className="panel" style={{ borderColor: '#A7F3D0' }}>
+          <div className="result-section-title">수기 추가 과목</div>
+          <ul className="rec-list">
+            {manualCourses.map((c, i) => (
+              <li key={i} className="rec-item">
+                <span className="rec-dot" style={{ background: '#18A679' }} />
+                {c.course_name} · {c.credits}학점 · {c.category}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* 하단 버튼 */}
       <div className="result-actions">
         <button className="btn-secondary" onClick={onReset}>← 처음으로</button>
         <button
           className="btn-outline-accent"
-          onClick={() => alert('수기 입력 모달 — 추후 구현')}
+          onClick={() => setShowManualModal(true)}
         >
           ✍️ 수강 중인 과목 추가
         </button>
       </div>
 
+      {showManualModal && (
+        <ManualCourseModal
+          onAdd={handleAddCourse}
+          onClose={() => setShowManualModal(false)}
+        />
+      )}
     </div>
   )
 }
