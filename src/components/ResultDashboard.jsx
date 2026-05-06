@@ -21,9 +21,9 @@ function guessCategory(course) {
 
 // ── 졸업요건 계산 ──────────────────────────────────────────
 function calcResult(courses, track) {
-  const REQ = { total: 135, major: 9, elective: 27, liberal: 43, required: 20 }
+  const REQ = { total: 135, major: 12, elective: 24, liberal: 43, required: 20 }
 
-  const valid = (courses|| [])
+  const valid = courses
     .filter(c => c.grade !== 'F')
     .map(c => ({ ...c, category: guessCategory(c) }))
 

@@ -601,3 +601,109 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 .btn-outline-accent:hover { background: #DDDDFB; }
 .result-actions .btn-secondary { padding: 14px 20px; }
+
+/*--로그인 버튼---*/
+.btn-login{
+  padding: 7px 16px;
+  border: 1.5px sold var(-accent);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-login:hover { background: var(--acceent-light); }
+
+.btn-logout{
+  padding: 7px 16px;
+  border: 1.5px solid var(--r -md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-logout:hover {background: var(--border); }
+
+/* ── 로그인 모달 ──────────────────────────────────────────── */
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0, .4);
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-box{
+  background: var(--surface);
+  border-radius: var(--r -log);
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.12);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.modal-close {
+  font-size: 16px;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--text-1); }
+ 
+.modal-body { margin-bottom: 20px; }
+ 
+.modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  color: var(--text-1);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s;
+  font-family: inherit;
+}
+.modal-input:focus { border-color: var(--accent); }
+ 
+.modal-error {
+  font-size: 13px;
+  color: #E24B4A;
+  margin-top: 8px;
+}
+ 
+.modal-footer {
+  display: flex;
+  gap: 10px;
+}
+.modal-footer .btn-primary  { flex: 1; }
+.modal-footer .btn-secondary { padding: 14px 20px; }
+ 
+.btn-primary:disabled {
+  background: var(--accent-dim);
+  cursor: not-allowed;
+}
+ 
+.modal-hint {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 14px;
+}
