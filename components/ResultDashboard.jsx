@@ -21,10 +21,10 @@ function guessCategory(course) {
 
 // ── 졸업요건 계산 ──────────────────────────────────────────
 function calcResult(courses, track) {
-  const REQ = { total: 135, major: 12, elective: 24, liberal: 43, required: 20 }
+  const REQ = { total: 135, major: 9, elective: 27, liberal: 43, required: 20 }
 
-  const valid = courses
-    .filter(c => c.grade !== 'F' && !c._placeholder)
+  const valid = (courses || [])
+    .filter(c => c.grade !== 'F')
     .map(c => ({ ...c, category: guessCategory(c) }))
 
   const sum = (filterFn) =>
@@ -131,64 +131,53 @@ function ManualCourseModal({ onAdd, onClose }) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title">수강 중인 과목 추가</h2>
+        <p className="modal-desc">현재 수강 중인 과목을 추가하면 결과에 바로 반영돼요.</p>
 
-        <div className="modal-header">
-          <h2 className="modal-title">수강 중인 과목 추가</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
+        <div className="modal-field">
+          <label className="field-label">과목명</label>
+          <input
+            ref={inputRef}
+            className="modal-input"
+            placeholder="과목명을 입력하세요"
+            value={form.courseName}
+            onChange={e => update('courseName', e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && submit()}
+          />
         </div>
 
-        <div className="modal-body">
-          <p className="modal-desc">현재 수강 중인 과목을 추가하면 결과에 바로 반영돼요.</p>
-
-          <div className="field-group">
-            <label className="field-label">과목명</label>
-            <input
-              ref={inputRef}
-              className="modal-input"
-              placeholder="과목명을 입력하세요"
-              value={form.courseName}
-              onChange={e => update('courseName', e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && submit()}
-            />
+        <div className="modal-row">
+          <div className="modal-field">
+            <label className="field-label">학점</label>
+            <select
+              className="modal-select"
+              value={form.credits}
+              onChange={e => update('credits', e.target.value)}
+            >
+              {[1, 2, 3].map(n => (
+                <option key={n} value={n}>{n}학점</option>
+              ))}
+            </select>
           </div>
-
-          <div className="modal-row">
-            <div className="field-group" style={{ flex: 1, marginBottom: 0 }}>
-              <label className="field-label">학점</label>
-              <select
-                className="modal-input modal-select"
-                value={form.credits}
-                onChange={e => update('credits', e.target.value)}
-              >
-                {[1, 2, 3].map(n => (
-                  <option key={n} value={n}>{n}학점</option>
-                ))}
-              </select>
-            </div>
-            <div className="field-group" style={{ flex: 2, marginBottom: 0 }}>
-              <label className="field-label">카테고리</label>
-              <select
-                className="modal-input modal-select"
-                value={form.category}
-                onChange={e => update('category', e.target.value)}
-              >
-                {CATEGORIES.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
+          <div className="modal-field">
+            <label className="field-label">카테고리</label>
+            <select
+              className="modal-select"
+              value={form.category}
+              onChange={e => update('category', e.target.value)}
+            >
+              {CATEGORIES.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        <div className="modal-footer">
+        <div className="modal-actions">
           <button className="btn-secondary" onClick={onClose}>취소</button>
-          <button
-            className="btn-primary"
-            onClick={submit}
-            disabled={!form.courseName.trim()}
-          >
+          <button className="btn-primary modal-submit" onClick={submit} disabled={!form.courseName.trim()}>
             추가하기
           </button>
         </div>

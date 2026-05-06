@@ -5,11 +5,10 @@ import SettingsPanel    from './components/SettingsPanel'
 import UploadPanel      from './components/UploadPanel'
 import ResultDashboard  from './components/ResultDashboard'
 import LoginModal       from './components/LoginModal'
-import './app.css'
 
 export default function App() {
   // ── 전역 state ──
-  const [user,     setUser]     = useState(null)   // { name, id } | null
+  const [user,      setUser]      = useState(null)   // { name, id } | null
   const [showLogin, setShowLogin] = useState(false)
 
   const [settings, setSettings] = useState({ studentId: '22', track: '일반' })

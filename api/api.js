@@ -32,3 +32,14 @@ export const getRules = async () => {
   if (!res.ok) throw new Error('졸업요건 조회 실패')
   return res.json()
 }
+
+// 백엔드 Auth API 완성되면 App.jsx의 임시 state 로그인을 이 함수로 교체
+export const login = async (username, password) => {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: { ...NGROK_HEADERS, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+  if (!res.ok) throw new Error('로그인 실패')
+  return res.json() // { token, user }
+}

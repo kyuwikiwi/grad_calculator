@@ -602,130 +602,104 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .btn-outline-accent:hover { background: #DDDDFB; }
 .result-actions .btn-secondary { padding: 14px 20px; }
 
-/* ── 로그인/로그아웃 버튼 (헤더) ── */
+/* ── 로그인 버튼 (헤더) ──────────────────────────────────── */
 .btn-login {
-  padding: 7px 16px;
+  padding: 8px 18px;
+  border-radius: 100px;
   border: 1.5px solid var(--accent);
-  border-radius: var(--radius-md);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--accent);
-  background: transparent;
-  cursor: pointer;
+  background: var(--accent-light);
   transition: background .15s;
 }
-.btn-login:hover { background: var(--accent-light); }
+.btn-login:hover { background: #DDDDFB; }
 
 .btn-logout {
-  padding: 7px 16px;
+  padding: 6px 14px;
+  border-radius: 100px;
   border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-2);
-  background: transparent;
-  cursor: pointer;
+  background: var(--bg);
   transition: background .15s;
 }
 .btn-logout:hover { background: var(--border); }
 
-/* ── 로그인 모달 ──────────────────────────────────────────── */
-.modal-backdrop{
+/* ── 모달 공용 ───────────────────────────────────────────── */
+.modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0, .4);
-  display:flex;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
+  padding: 24px;
 }
-
 .modal-box {
   background: var(--surface);
   border-radius: var(--radius-lg);
-  padding: 28px 32px;
+  padding: 36px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.12);
-}
-.modal-header {
+  max-width: 440px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.18);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+  flex-direction: column;
+  gap: 20px;
 }
 .modal-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-1);
 }
-.modal-close {
-  font-size: 16px;
-  color: var(--text-3);
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-}
-.modal-close:hover { color: var(--text-1); }
- 
-.modal-body { margin-bottom: 20px; }
- 
-.modal-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  color: var(--text-1);
-  background: var(--bg);
-  outline: none;
-  transition: border-color .15s;
-  font-family: inherit;
-}
-.modal-input:focus { border-color: var(--accent); }
- 
-.modal-error {
-  font-size: 13px;
-  color: #E24B4A;
-  margin-top: 8px;
-}
- 
-.modal-footer {
-  display: flex;
-  gap: 10px;
-}
-.modal-footer .btn-primary  { flex: 1; }
-.modal-footer .btn-secondary { padding: 14px 20px; }
- 
-.btn-primary:disabled {
-  background: var(--accent-dim);
-  cursor: not-allowed;
-}
- 
-.modal-hint {
-  font-size: 11px;
-  color: var(--text-3);
-  text-align: center;
-  margin-top: 14px;
-}
-
 .modal-desc {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-2);
-  margin-bottom: 20px;
   line-height: 1.6;
+  margin-top: -8px;
 }
-
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
 .modal-row {
   display: flex;
   gap: 12px;
 }
-
+.modal-input,
 .modal-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 32px;
-  cursor: pointer;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-1);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .15s;
+}
+.modal-input:focus,
+.modal-select:focus {
+  border-color: var(--accent);
+}
+.modal-input::placeholder { color: var(--text-3); }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.modal-actions .btn-secondary {
+  padding: 14px 20px;
+}
+.modal-submit {
+  flex: 1;
+}
+.btn-primary:disabled {
+  opacity: .45;
+  cursor: not-allowed;
 }
