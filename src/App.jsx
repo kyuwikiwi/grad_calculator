@@ -6,7 +6,10 @@ import UploadPanel     from './components/UploadPanel'
 import ResultDashboard from './components/ResultDashboard'
 import LoginModal      from './components/LoginModal'
 import ManualAddModal  from './components/ManualAddModal'
+<<<<<<< HEAD
 import ChatBot from './components/ChatBot'
+=======
+>>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87
 import './app.css'
 
 export default function App() {
@@ -157,11 +160,14 @@ export default function App() {
         />
       )}
 
+<<<<<<< HEAD
       {/* ── 챗봇 (로그인 후에만 표시) ── */}
       {user && (
         <ChatBot user={user} settings={settings}/>
       )}
 
+=======
+>>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87
     </div>
   )
 }

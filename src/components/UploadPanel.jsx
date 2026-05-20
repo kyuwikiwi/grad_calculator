@@ -168,4 +168,8 @@ export default function UploadPanel({ settings, onParsed }) {
 
     </div>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87

@@ -543,6 +543,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   gap: 8px;
   flex: 1;
 }
+<<<<<<< HEAD
 .modal-submit { flex: 1; }
 
 /* ════════════════════════════════════════════════
@@ -1045,3 +1046,6 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
   .chatbot__input { color: #ede9ff; }
 }
+=======
+.modal-submit { flex: 1; }
+>>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87
