@@ -4,156 +4,271 @@ import { useState, useRef, useEffect } from 'react'
 
 const BASE = 'https://unbranded-appreciably-merrill.ngrok-free.dev'
 
-const WELCOME_MSG = {
-  id: 0,
-  role: 'bot',
-  text: '안녕하세요! 졸업요건 관련 궁금한 점을 물어보세요 😊\n예: "전공필수 뭐 들어야 해?", "졸업요건 몇 학점 들어야돼?"',
+// ────────────────────────────────────────────────
+// 상수
+// ────────────────────────────────────────────────
+const SUGGESTED_QUESTIONS = [
+  "졸업인증(외국어/정보) 통과 기준을 알려줘",
+  "3000~4000단위 이상 과목 이수 요건을 알려줘",
+  "2전공이 소프트웨어전공인데 주의할 점을 알려줘",
+  "1전공이 SW, 2전공이 SW심화일 때 중복 인정은 어떻게 되는지 알려줘",
+];
+
+//API - 백엔드 /chatbot/ask 호출
+async function fetchChatReply(message, studentId, track){
+  const res= await fetch('${BASE}/chatbot/ask', {
+    method: 'POST',
+    headers:{
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning':'true',
+    },
+    body: JSON.stringify({
+      student_id: studentId,
+      message,
+    }),
+  })
+  if (!res.ok) throw new Error(`API error: ${res.status}`)
+  const data = await res.json()
+  return data.answer ?? '죄송해요, 답변을 가져오지 못했어요.'
 }
 
-export default function ChatBot({ user, settings }) {
-  const [open,     setOpen]     = useState(false)
-  const [messages, setMessages] = useState([WELCOME_MSG])
-  const [input,    setInput]    = useState('')
-  const [loading,  setLoading]  = useState(false)
-  const bottomRef = useRef()
+//서브 컴포넌트
+function TypingDots(){
+  return (
+    <div className="chatbot__dots">
+      <span className="chatbot__dot"/>
+      <span className="chatbot__dot chatbot__dot--d1"/>
+      <span className="chatbot__dot chatbot__dot--d2"/>
+    </div>
+  )
+}
 
-  // 새 메시지 올 때마다 스크롤 아래로
-  useEffect(() => {
-    if (open) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, open])
+function BotAvatar(){
+  return <div className="chatbot__bot-avatar">🎓</div>
+}
 
-  const sendMessage = async () => {
-    const text = input.trim()
-    if (!text || loading) return
+function SuggestionPills({questions, onSelect}){
+  return (
+    <div className="chatbot__suggestion-card">
+      <p className="chatbot__suggestion-title">이런게 궁금하신가요?</p>
+      <p className="chatbot__suggestion-hint">
+        아래 문의는 졸업 도우미 그래가 더 빠르게 도와드려요
+      </p>
+      <div className="chatbot__pills">
+        {questions.map((q,i)=>(
+          <button key={i} className="chatbot__pill" onClick={()=> onSelect(q)}>
+            {q}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+//챗봇 패널(내부)
+function chatPanel({studentId, track, onClose}){
+  const [messages, setMessages]= useState([])
+  const [input, setInput]= useState('')
+  const [loading, setLoading]= useState(false)
+  const [showSuggestions, setShowSuggestions]= useState(true)
+  const bottomRef= useRef(null)
+  const inputRef= useRef(null)
+
+  useEffect(()=> {
+    bottomRef.current?.scrollIntoView({behavior: 'smooth'})
+  }, [messages, loading])
+
+  useEffect(()=>{
+    setTimeout(() => inputRef.current?.focus(), 300)
+  }, [])
+
+  async function sendMessage(text){
+    const userText=(text ?? input).trim()
+    if (!userText || loading) return
+
     setInput('')
+    setShowSuggestions(false)
 
-    const userMsg = { id: Date.now(), role: 'user', text }
-    setMessages(prev => [...prev, userMsg])
+    const nextMessages=[...messages, {role: 'user', content: userText}]
+    setMessages(nextMessages)
     setLoading(true)
 
-    try {
-      const res = await fetch(`${BASE}/chatbot/ask`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
-        body: JSON.stringify({
-        student_id: settings?.studentId,
-        message: text,
-}),
-      })
-      const data = await res.json()
-      setMessages(prev => [...prev, {
-        id: Date.now(),
-        role: 'bot',
-        text: data.answer,
-        }])
-    } catch {
-      setMessages(prev => [...prev, {
-        id: Date.now(),
-        role: 'bot',
-        text: '죄송해요, 잠시 후 다시 시도해주세요.',
-      }])
-    } finally {
+    try{
+      const reply= await fetchChatReply(userText, studentId, track)
+      setMessages(prev => [...prev, {role: 'assistant', content:reply}])
+    }catch{
+      setMessages(prev=> [
+        ...prev,
+        { role: 'assistant', content:'오류가 발생했어요. 잠시후 다시 시도해 주세요.'},
+      ])
+    }finally{
       setLoading(false)
     }
   }
 
-  const onKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  function handleKeyDown(e){
+    if(e.key=== 'Enter' && !e.shiftKey){
       e.preventDefault()
       sendMessage()
     }
   }
 
+  const hasMessages= messages.length >0
+
   return (
-    <>
-      {/* ── 채팅창 ── */}
-      <div className={`chat-window ${open ? 'chat-window--open' : ''}`}>
+    <div className="chatbot__panel">
 
-        {/* 헤더 */}
-        <div className="chat-header">
-          <div className="chat-header-info">
-            <div className="chat-avatar-sm">🎓</div>
-            <div>
-              <p className="chat-header-name">Gradulator AI</p>
-              <p className="chat-header-status">졸업요건 도우미</p>
-            </div>
+      {/* 헤더 */}
+      <div className="chatbot__header">
+        <div className="chatbot__header-left">
+          <div className="chatbot__header-avatar">🎓</div>
+          <div className="chatbot__header-info">
+            <span className="chatbot__header-title">졸업 도우미 그래</span>
+            {(studentId || track )&&(
+              <span className="chatbot__header-sub">
+                {[studentId, track].filter(Boolean).join(' · ')}
+              </span>
+            )}
           </div>
-          <button className="chat-close" onClick={() => setOpen(false)}>✕</button>
         </div>
-
-        {/* 메시지 리스트 */}
-        <div className="chat-messages">
-          {messages.map(msg => (
-            <div key={msg.id} className={`chat-bubble-wrap chat-bubble-wrap--${msg.role}`}>
-              {msg.role === 'bot' && <div className="chat-bot-icon">🎓</div>}
-              <div className={`chat-bubble chat-bubble--${msg.role}`}>
-                {msg.text.split('\n').map((line, i) => (
-                  <span key={i}>
-                    {line}
-                    {i < msg.text.split('\n').length - 1 && <br />}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          {/* 로딩 점점점 */}
-          {loading && (
-            <div className="chat-bubble-wrap chat-bubble-wrap--bot">
-              <div className="chat-bot-icon">🎓</div>
-              <div className="chat-bubble chat-bubble--bot chat-bubble--loading">
-                <span className="chat-dot" />
-                <span className="chat-dot" />
-                <span className="chat-dot" />
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* 입력창 */}
-        <div className="chat-input-wrap">
-          <textarea
-            className="chat-input"
-            placeholder="메시지를 입력하세요..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-            rows={1}
-          />
-          <button
-            className="chat-send"
-            onClick={sendMessage}
-            disabled={!input.trim() || loading}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M2 9l13-7-5 7 5 7-13-7z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
-
+        <button className="chatbot__icon-btn" aria-label="닫기" onClick={onClose}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
-      {/* ── 플로팅 버튼 ── */}
+
+    {/* 메시지 영역 */}
+      <div className="chatbot__body">
+        {!hasMessages && (
+          <div className="chatbot__welcome">
+            <p className="chatbot__welcome-name">
+              안녕하세요{studentId ? `, ${studentId}님` : ''}
+            </p>
+            <p className="chatbot__welcome-sub">졸업 도우미 그래에요 👋</p>
+            {showSuggestions && (
+              <SuggestionPills
+                questions={SUGGESTED_QUESTIONS}
+                onSelect={sendMessage}
+              />
+            )}
+          </div>
+        )}
+ 
+        {messages.map((msg, i) => (
+          <div key={i} className={`chatbot__row chatbot__row--${msg.role}`}>
+            {msg.role === 'assistant' && <BotAvatar />}
+            <div className={`chatbot__bubble chatbot__bubble--${msg.role}`}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
+ 
+        {loading && (
+          <div className="chatbot__row chatbot__row--assistant">
+            <BotAvatar />
+            <div className="chatbot__bubble chatbot__bubble--assistant">
+              <TypingDots />
+            </div>
+          </div>
+        )}
+ 
+        <div ref={bottomRef} />
+      </div>
+ 
+      {/* 퀵리플라이 */}
+      {hasMessages && !loading && (
+        <div className="chatbot__quick-area">
+          <button
+            className="chatbot__quick-btn"
+            onClick={() => setShowSuggestions(v => !v)}
+          >
+            이런 질문도 답할 수 있어요
+          </button>
+        </div>
+      )}
+ 
+      {hasMessages && showSuggestions && (
+        <div className="chatbot__float-suggestions">
+          {SUGGESTED_QUESTIONS.map((q, i) => (
+            <button
+              key={i}
+              className="chatbot__pill"
+              onClick={() => { setShowSuggestions(false); sendMessage(q) }}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+ 
+      {/* 입력 바 */}
+      <div className="chatbot__input-bar">
+        <input
+          ref={inputRef}
+          className="chatbot__input"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="궁금한 내용을 적어주세요"
+          disabled={loading}
+        />
+        <button
+          className={`chatbot__send-btn${input.trim() ? '' : ' chatbot__send-btn--disabled'}`}
+          onClick={() => sendMessage()}
+          disabled={!input.trim() || loading}
+          aria-label="전송"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 4v16M12 4l-6 6M12 4l6 6" />
+          </svg>
+        </button>
+      </div>
+ 
+    </div>
+  )
+}
+ 
+// ────────────────────────────────────────────────
+// 메인 export — 플로팅 버튼 + 패널
+// ────────────────────────────────────────────────
+export default function ChatBot({ studentId, track }) {
+  const [isOpen, setIsOpen] = useState(false)
+ 
+  return (
+    <>
+      {/* 딤 오버레이 */}
+      {isOpen && (
+        <div className="chatbot__overlay" onClick={() => setIsOpen(false)} />
+      )}
+ 
+      {/* 챗봇 패널 */}
+      <div className={`chatbot__wrapper${isOpen ? ' chatbot__wrapper--open' : ''}`}>
+        <ChatPanel
+          studentId={studentId}
+          track={track}
+          onClose={() => setIsOpen(false)}
+        />
+      </div>
+ 
+      {/* 플로팅 액션 버튼 */}
       <button
-        className={`chat-fab ${open ? 'chat-fab--open' : ''}`}
-        onClick={() => setOpen(prev => !prev)}
-        aria-label="챗봇 열기"
+        className={`chatbot__fab${isOpen ? ' chatbot__fab--active' : ''}`}
+        onClick={() => setIsOpen(v => !v)}
+        aria-label={isOpen ? '챗봇 닫기' : '졸업 도우미 열기'}
       >
-        {open ? (
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M4 4l14 14M18 4L4 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+        {isOpen ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         ) : (
-          <span className="chat-fab-emoji">💬</span>
-        )}
-        {!open && messages.length > 1 && (
-          <span className="chat-fab-badge">
-            {messages.filter(m => m.role === 'bot').length}
-          </span>
+          <>
+            <span className="chatbot__fab-emoji">🎓</span>
+            <span className="chatbot__fab-label">졸업 도우미</span>
+          </>
         )}
       </button>
     </>
