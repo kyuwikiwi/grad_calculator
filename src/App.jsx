@@ -11,18 +11,20 @@ import './app.css'
 
 export default function App() {
   // ── 전역 state ──
-  const [user,      setUser]      = useState(null)
-  const [showLogin, setShowLogin] = useState(true)
+  const [user,            setUser]            = useState(null)
+  const [showLogin,       setShowLogin]       = useState(true)
 
-  const [settings, setSettings] = useState({ studentId: '22', track: '일반' })
-  const [courses,  setCourses]  = useState([])
-  const [result,   setResult]   = useState(null)
-  const [step,     setStep]     = useState('settings') // settings | upload | result | manual
+  const [settings,        setSettings]        = useState({ studentId: '22', track: '일반' })
+  const [courses,         setCourses]         = useState([])
+  const [result,          setResult]          = useState(null)
+  const [step,            setStep]            = useState('settings')
+  const [parsedStudentId, setParsedStudentId] = useState(null) // 파싱된 실제 학번
 
   const reset = () => {
     setCourses([])
     setResult(null)
     setStep('settings')
+    setParsedStudentId(null)
   }
 
   const handleLogin = (userData) => {
@@ -121,6 +123,9 @@ export default function App() {
                 settings={settings}
                 onParsed={(parsed) => {
                   setCourses(parsed)
+                  // 파싱된 실제 student_id 저장
+                  const sid = parsed?.[0]?.student_id ?? null
+                  setParsedStudentId(sid)
                   setResult({ _calculated: true })
                   setStep('result')
                 }}
@@ -130,7 +135,10 @@ export default function App() {
             {step === 'result' && (
               <ResultDashboard
                 courses={courses}
-                settings={settings}
+                settings={{
+                  ...settings,
+                  studentId: parsedStudentId || settings.studentId,
+                }}
                 onReset={reset}
                 onManualAdd={() => setStep('manual')}
               />

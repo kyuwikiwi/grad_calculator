@@ -1127,3 +1127,69 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
   .chatbot__input { color: #ede9ff; }
 }
+
+/* ── 중복인정 카드 ── */
+.duplicate-card { }
+.duplicate-info { display: flex; flex-direction: column; gap: 4px; }
+.duplicate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.duplicate-label { font-size: 14px; font-weight: 500; color: var(--text-1); }
+.duplicate-value { font-size: 14px; font-weight: 700; color: var(--accent); }
+.duplicate-limit { font-size: 12px; font-weight: 400; color: var(--text-3); }
+.duplicate-hint  { font-size: 12px; color: var(--text-2); margin-top: 8px; line-height: 1.6; }
+
+/* ── TrackGuide ─────────────────────────────────────────── */
+.track-guide-panel { cursor: default; }
+.track-guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding-bottom: 4px;
+}
+.track-guide-sub { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+.track-guide-arrow { font-size: 12px; color: var(--text-3); }
+.track-guide-body { margin-top: 20px; }
+
+.track-stat-list { display: flex; flex-direction: column; gap: 10px; }
+.track-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.track-stat-name { font-size: 13px; color: var(--text-1); width: 80px; flex-shrink: 0; }
+.track-stat-bar-wrap {
+  flex: 1;
+  height: 7px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.track-stat-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width .6s ease;
+}
+.track-stat-pct { font-size: 11px; color: var(--text-3); width: 32px; text-align: right; }
+
+.track-stat-card { margin-bottom: 20px; }
+.track-stat-title { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 12px; }
+.track-course-list { display: flex; flex-direction: column; gap: 8px; }
+.track-course-row { display: flex; align-items: center; gap: 10px; }
+.track-course-code { font-size: 12px; color: var(--text-2); width: 80px; flex-shrink: 0; }
+
+.track-guide-result { margin-top: 4px; }
+.track-guide-content {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text-1);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

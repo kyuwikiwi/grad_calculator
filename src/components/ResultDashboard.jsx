@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getGraduationResult } from '../api/api'
+import TrackGuide from './TrackGuide'
 
 // ── 프로그레스 바 색상 ─────────────────────────────────────
 function barColor(pct) {
@@ -43,7 +44,7 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getGraduationResult(settings.studentId)
+        const data = await getGraduationResult(settings.studentId, settings.track)
         setResult(data)
       } catch (e) {
         setError('졸업요건 데이터를 불러오지 못했어요.')
@@ -73,12 +74,15 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
     )
   }
 
-  const { is_graduated, areas, lacking_total } = result
+  const {
+    is_graduated,
+    areas,
+    lacking_total,
+    duplicate_credits,
+    duplicate_limit,
+  } = result
 
-  // 부족한 영역
-  const recommendations = areas
-    .filter(a => a.current < a.required)
-    .map(a => `${a.name} ${a.required - a.current}학점`)
+  const isSim = settings.track === '심화'
 
   // 초과된 영역
   const exceeded = areas
@@ -102,6 +106,31 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
           </p>
         </div>
       </div>
+
+      {/* 심화전공 중복인정 카드 */}
+      {isSim && duplicate_credits !== undefined && (
+        <div className="panel duplicate-card">
+          <div className="result-section-title">전공 중복인정 현황</div>
+          <div className="duplicate-info">
+            <div className="duplicate-row">
+              <span className="duplicate-label">중복인정 학점</span>
+              <span className="duplicate-value">
+                {duplicate_credits}학점
+                <span className="duplicate-limit"> / 최대 {duplicate_limit}학점</span>
+              </span>
+            </div>
+            <div className="progress-track" style={{ marginTop: '8px' }}>
+              <div
+                className="progress-fill bar--green"
+                style={{ width: `${Math.round((duplicate_credits / duplicate_limit) * 100)}%` }}
+              />
+            </div>
+            <p className="duplicate-hint">
+              기본전공과 심화전공 공통 과목 중 최대 {duplicate_limit}학점까지 심화전공 학점으로 인정돼요.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 영역별 게이지 */}
       <div className="panel result-panel">
@@ -130,19 +159,8 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
         </div>
       )}
 
-      {/* 권장 수강 */}
-      {recommendations.length > 0 && (
-        <div className="panel rec-panel">
-          <div className="result-section-title">다음 학기 권장 수강</div>
-          <ul className="rec-list">
-            {recommendations.map((r, i) => (
-              <li key={i} className="rec-item">
-                <span className="rec-dot" />{r}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* 트랙별 이수 가이드 */}
+      <TrackGuide courses={courses} />
 
       {/* 하단 버튼 */}
       <div className="result-actions">
