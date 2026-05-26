@@ -1,38 +1,31 @@
 // src/App.jsx
 
 import { useState } from 'react'
-import SettingsPanel   from './components/SettingsPanel'
-import UploadPanel     from './components/UploadPanel'
-import ResultDashboard from './components/ResultDashboard'
-import LoginModal      from './components/LoginModal'
-import ManualAddModal  from './components/ManualAddModal'
-<<<<<<< HEAD
-import ChatBot from './components/ChatBot'
-=======
->>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87
+import SettingsPanel    from './components/SettingsPanel'
+import UploadPanel      from './components/UploadPanel'
+import ResultDashboard  from './components/ResultDashboard'
+import ManualAddScreen  from './components/ManualAddScreen'
+import LoginModal       from './components/LoginModal'
+import ChatBot          from './components/ChatBot'
 import './app.css'
 
 export default function App() {
   // ── 전역 state ──
-  const [user,          setUser]          = useState(null)
-  const [showLogin,     setShowLogin]     = useState(true)  // 첫 화면 = 로그인
-  const [showManualAdd, setShowManualAdd] = useState(false)
+  const [user,            setUser]            = useState(null)
+  const [showLogin,       setShowLogin]       = useState(true)
 
-  const [settings, setSettings] = useState({ studentId: '22', track: '일반' })
-  const [courses,  setCourses]  = useState([])
-  const [result,   setResult]   = useState(null)
+  const [settings,        setSettings]        = useState({ studentId: '22', track: '일반' })
+  const [courses,         setCourses]         = useState([])
+  const [result,          setResult]          = useState(null)
+  const [step,            setStep]            = useState('settings')
+  const [parsedStudentId, setParsedStudentId] = useState(null) // 파싱된 실제 학번
 
-  const step = result
-    ? 'result'
-    : courses.length > 0
-    ? 'upload'
-    : 'settings'
-
-  const STEPS     = ['정보 입력', '성적 업로드', '결과 확인']
-  const STEP_KEYS = ['settings', 'upload', 'result']
-  const currentIdx = STEP_KEYS.indexOf(step)
-
-  const reset = () => { setCourses([]); setResult(null) }
+  const reset = () => {
+    setCourses([])
+    setResult(null)
+    setStep('settings')
+    setParsedStudentId(null)
+  }
 
   const handleLogin = (userData) => {
     setUser(userData)
@@ -45,11 +38,13 @@ export default function App() {
     reset()
   }
 
-  // 수기 입력 과목 추가 — courses에 합산 후 결과 재계산
   const handleManualAdd = (newCourse) => {
     setCourses(prev => [...prev, newCourse])
-    setShowManualAdd(false)
   }
+
+  const STEPS     = ['정보 입력', '성적 업로드', '결과 확인']
+  const STEP_KEYS = ['settings', 'upload', 'result']
+  const currentIdx = STEP_KEYS.indexOf(step)
 
   return (
     <div className="app-root">
@@ -94,30 +89,32 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* ── Step indicator ── */}
-            <div className="step-indicator">
-              {STEPS.map((label, i) => {
-                const status = i < currentIdx ? 'done' : i === currentIdx ? 'active' : 'idle'
-                return (
-                  <div key={label} className="step-item">
-                    <div className={`step-circle step-circle--${status}`}>
-                      {i < currentIdx ? '✓' : i + 1}
+            {/* ── Step indicator (manual 화면에서는 숨김) ── */}
+            {step !== 'manual' && (
+              <div className="step-indicator">
+                {STEPS.map((label, i) => {
+                  const status = i < currentIdx ? 'done' : i === currentIdx ? 'active' : 'idle'
+                  return (
+                    <div key={label} className="step-item">
+                      <div className={`step-circle step-circle--${status}`}>
+                        {i < currentIdx ? '✓' : i + 1}
+                      </div>
+                      <span className={`step-label step-label--${status}`}>{label}</span>
+                      {i < 2 && (
+                        <div className={`step-line ${i < currentIdx ? 'step-line--done' : ''}`} />
+                      )}
                     </div>
-                    <span className={`step-label step-label--${status}`}>{label}</span>
-                    {i < 2 && (
-                      <div className={`step-line ${i < currentIdx ? 'step-line--done' : ''}`} />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
 
             {/* ── 화면 렌더링 ── */}
             {step === 'settings' && (
               <SettingsPanel
                 settings={settings}
                 onChange={setSettings}
-                onNext={() => setCourses([{ _placeholder: true }])}
+                onNext={() => setStep('upload')}
               />
             )}
 
@@ -126,7 +123,11 @@ export default function App() {
                 settings={settings}
                 onParsed={(parsed) => {
                   setCourses(parsed)
+                  // 파싱된 실제 student_id 저장
+                  const sid = parsed?.[0]?.student_id ?? null
+                  setParsedStudentId(sid)
                   setResult({ _calculated: true })
+                  setStep('result')
                 }}
               />
             )}
@@ -134,9 +135,19 @@ export default function App() {
             {step === 'result' && (
               <ResultDashboard
                 courses={courses}
-                settings={settings}
+                settings={{
+                  ...settings,
+                  studentId: parsedStudentId || settings.studentId,
+                }}
                 onReset={reset}
-                onManualAdd={() => setShowManualAdd(true)}
+                onManualAdd={() => setStep('manual')}
+              />
+            )}
+
+            {step === 'manual' && (
+              <ManualAddScreen
+                onAdd={handleManualAdd}
+                onBack={() => setStep('result')}
               />
             )}
           </>
@@ -144,7 +155,7 @@ export default function App() {
 
       </main>
 
-      {/* ── 로그인 모달 — 닫기 불가 (첫 화면) ── */}
+      {/* ── 로그인 모달 ── */}
       {showLogin && (
         <LoginModal
           onLogin={handleLogin}
@@ -152,22 +163,11 @@ export default function App() {
         />
       )}
 
-      {/* ── 수기 입력 모달 ── */}
-      {showManualAdd && (
-        <ManualAddModal
-          onAdd={handleManualAdd}
-          onClose={() => setShowManualAdd(false)}
-        />
-      )}
-
-<<<<<<< HEAD
       {/* ── 챗봇 (로그인 후에만 표시) ── */}
       {user && (
-        <ChatBot user={user} settings={settings}/>
+        <ChatBot studentId={settings.studentId} track={settings.track} />
       )}
 
-=======
->>>>>>> 311f10f74c4adaddd6ba819f93647cfc5cd96b87
     </div>
   )
 }
