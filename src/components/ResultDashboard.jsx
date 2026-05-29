@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { getGraduationResult } from '../api/api'
 import TrackGuide from './TrackGuide'
 
-// ── 프로그레스 바 색상 ─────────────────────────────────────
 function barColor(pct) {
   if (pct >= 100) return 'bar--green'
   if (pct >= 80)  return 'bar--amber'
@@ -35,7 +34,6 @@ function ProgressRow({ area }) {
   )
 }
 
-// ── 메인 컴포넌트 ──────────────────────────────────────────
 export default function ResultDashboard({ courses, settings, onReset, onManualAdd }) {
   const [result,  setResult]  = useState(null)
   const [loading, setLoading] = useState(true)
@@ -44,7 +42,11 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getGraduationResult(settings.studentId, settings.track)
+        const data = await getGraduationResult(
+          settings.studentId,
+          settings.track,
+          settings.subTrack
+        )
         setResult(data)
       } catch (e) {
         setError('졸업요건 데이터를 불러오지 못했어요.')
@@ -84,7 +86,6 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
 
   const isSim = settings.track === '심화'
 
-  // 초과된 영역
   const exceeded = areas
     .filter(a => a.current > a.required)
     .map(a => `${a.name} ${a.current - a.required}학점 초과`)
@@ -102,7 +103,8 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
               : `졸업까지 ${lacking_total}학점이 더 필요해요`}
           </p>
           <p className="verdict-sub">
-            {settings.studentId}학번 · {settings.track}과정 기준
+            {settings.studentId}학번 · {settings.track}과정
+            {isSim && settings.subTrack && ` · ${settings.subTrack} 트랙`} 기준
           </p>
         </div>
       </div>
@@ -159,8 +161,14 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
         </div>
       )}
 
-      {/* 트랙별 이수 가이드 */}
-      <TrackGuide courses={courses} />
+      {/* 선배 추천 과목 (심화만) */}
+      <TrackGuide
+        courses={courses}
+        settings={settings}
+        onAddCourse={(course) => {
+          onManualAdd(course)
+        }}
+      />
 
       {/* 하단 버튼 */}
       <div className="result-actions">

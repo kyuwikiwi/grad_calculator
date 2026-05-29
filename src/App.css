@@ -1193,3 +1193,29 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   line-height: 1.7;
   white-space: pre-wrap;
 }
+
+/* ── 심화 트랙 선택 ── */
+.subtrack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.subtrack-btn {
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.subtrack-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+.subtrack-btn--active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}

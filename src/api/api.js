@@ -7,7 +7,37 @@ const HEADERS = {
   'Content-Type': 'application/json',
 }
 
-// 성적표 파싱 + DB 저장
+// ── 인증 ──────────────────────────────────────────────────
+
+export const register = async (username, password) => {
+  const res = await fetch(`${BASE}/auth/register`, {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({ username, password }),
+  })
+  if (!res.ok) throw new Error('회원가입 실패')
+  return res.json()
+}
+
+export const login = async (username, password) => {
+  const form = new URLSearchParams()
+  form.append('username', username)
+  form.append('password', password)
+
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form.toString(),
+  })
+  if (!res.ok) throw new Error('로그인 실패')
+  return res.json()
+}
+
+// ── 성적 ──────────────────────────────────────────────────
+
 export const parseFile = async (file) => {
   const form = new FormData()
   form.append('file', file)
@@ -21,7 +51,6 @@ export const parseFile = async (file) => {
   return res.json()
 }
 
-// 파싱 후 저장된 과목 조회
 export const getCourses = async (studentId) => {
   const res = await fetch(`${BASE}/courses/?student_id=${studentId}`, {
     headers: HEADERS,
@@ -30,10 +59,10 @@ export const getCourses = async (studentId) => {
   return res.json()
 }
 
-// 졸업요건 계산 결과 조회
-export const getGraduationResult = async (studentId, track) => {
+export const getGraduationResult = async (studentId, track, subTrack) => {
   const params = new URLSearchParams({ student_id: studentId })
   if (track) params.append('track', track)
+  if (subTrack && subTrack !== '선택 안 함') params.append('sub_track', subTrack)
 
   const res = await fetch(`${BASE}/graduation/result?${params}`, {
     headers: HEADERS,
@@ -42,7 +71,8 @@ export const getGraduationResult = async (studentId, track) => {
   return res.json()
 }
 
-// 트랙 목록 조회
+// ── 트랙 ──────────────────────────────────────────────────
+
 export const getTrackList = async () => {
   const res = await fetch(`${BASE}/track/list`, {
     headers: HEADERS,
@@ -51,7 +81,6 @@ export const getTrackList = async () => {
   return res.json()
 }
 
-// 트랙별 선배 수강 통계
 export const getTrackStatistics = async () => {
   const res = await fetch(`${BASE}/track/statistics`, {
     headers: HEADERS,
@@ -60,7 +89,6 @@ export const getTrackStatistics = async () => {
   return res.json()
 }
 
-// 트랙 이수 가이드
 export const getTrackGuide = async (completedCourses, targetTrack) => {
   const res = await fetch(`${BASE}/track/guide`, {
     method: 'POST',
@@ -74,7 +102,6 @@ export const getTrackGuide = async (completedCourses, targetTrack) => {
   return res.json()
 }
 
-// 졸업요건 규칙 조회
 export const getRules = async () => {
   const res = await fetch(`${BASE}/rules/`, {
     headers: HEADERS,
