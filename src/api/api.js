@@ -59,13 +59,19 @@ export const getCourses = async (studentId) => {
   return res.json()
 }
 
-export const getGraduationResult = async (studentId, track, subTrack) => {
-  const params = new URLSearchParams({ student_id: studentId })
-  if (track) params.append('track', track)
-  if (subTrack && subTrack !== '선택 안 함') params.append('sub_track', subTrack)
+// 졸업요건 계산 — POST로 변경
+export const getGraduationResult = async (studentId, track, subTrack, excludedCourses = []) => {
+  const body = {
+    student_id: studentId,
+    track: track || '기본',
+  }
+  if (subTrack && subTrack !== '선택 안 함') body.sub_track = subTrack
+  if (excludedCourses.length > 0) body.excluded_courses = excludedCourses
 
-  const res = await fetch(`${BASE}/graduation/result?${params}`, {
+  const res = await fetch(`${BASE}/graduation/result`, {
+    method: 'POST',
     headers: HEADERS,
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error('졸업요건 조회 실패')
   return res.json()

@@ -11,7 +11,7 @@ export default function SettingsPanel({ settings, onChange, onNext }) {
     onChange({
       ...settings,
       track,
-      subTrack: track === '심화' ? '선택 안 함' : null,
+      subTrack: settings.subTrack || '선택 안 함',
     })
   }
 
@@ -61,30 +61,28 @@ export default function SettingsPanel({ settings, onChange, onNext }) {
         </div>
       </div>
 
-      {/* 심화 트랙 선택 */}
-      {settings.track === '심화' && (
-        <div className="field-group">
-          <label className="field-label">심화 트랙</label>
-          <div className="subtrack-list">
-            {SUB_TRACKS.map(t => (
-              <button
-                key={t}
-                className={`subtrack-btn ${settings.subTrack === t ? 'subtrack-btn--active' : ''}`}
-                onClick={() => update('subTrack', t)}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+      {/* 트랙 선택 — 항상 표시 */}
+      <div className="field-group">
+        <label className="field-label">트랙 선택</label>
+        <div className="subtrack-list">
+          {SUB_TRACKS.map(t => (
+            <button
+              key={t}
+              className={`subtrack-btn ${(settings.subTrack || '선택 안 함') === t ? 'subtrack-btn--active' : ''}`}
+              onClick={() => update('subTrack', t)}
+            >
+              {t}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
       {/* 선택 요약 */}
       <div className="summary-box">
         <span className="summary-icon">📋</span>
         <span className="summary-text">
           <strong>{settings.studentId}학번</strong> · <strong>{settings.track}과정</strong>
-          {settings.track === '심화' && settings.subTrack && settings.subTrack !== '선택 안 함' && (
+          {settings.subTrack && settings.subTrack !== '선택 안 함' && (
             <> · <strong>{settings.subTrack} 트랙</strong></>
           )}
           {' '}기준으로 계산합니다

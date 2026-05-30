@@ -92,19 +92,32 @@ export default function TrackGuide({ courses, settings, onAddCourse }) {
         {isCompleted ? (
           <span className="track-course-card-done">✓ 이수완료</span>
         ) : (
-          <button
-            className="track-course-card-add"
-            onClick={() => onAddCourse?.({
-              course_code:     item.code,
-              course_name:     item.name,
-              credits:         3,
-              grade:           '수강중',
-              category:        '전공선택',
-              is_hybrid_added: true,
-            })}
-          >
-            + 담기
-          </button>
+            // 수정
+            <button
+              style={{
+                padding: '6px 12px',
+                backgroundColor: 'var(--accent-light)',
+                color: 'var(--accent)',
+                border: '1px solid var(--accent-dim)',
+                borderRadius: '6px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                marginLeft: '12px',   // ← 간격 추가
+                flexShrink: 0,        // ← 찌그러짐 방지
+                fontFamily: 'inherit',
+              }}
+              onClick={() => onAddCourse?.({
+                course_code:     item.code,
+                course_name:     item.name,
+                credits:         3,
+                grade:           '수강중',
+                category:        '전공선택',
+                is_hybrid_added: true,
+              })}
+            >
+              + 담기
+            </button>
         )}
       </div>
     )
@@ -146,7 +159,7 @@ export default function TrackGuide({ courses, settings, onAddCourse }) {
               {tier1.length > 0 && (
                 <div className="track-tier">
                   <div className="track-tier-title track-tier-title--1">
-                    🏆 선배들의 필수 픽
+                    🏆 선배들의 필수 픽  
                   </div>
                   <div className="track-tier-cards">
                     {tier1.map(item => <CourseCard key={item.code} item={item} />)}
@@ -157,7 +170,8 @@ export default function TrackGuide({ courses, settings, onAddCourse }) {
               {tier2.length > 0 && (
                 <div className="track-tier">
                   <div className="track-tier-title track-tier-title--2">
-                    ➕ 함께 고민해볼 과목
+                    
+                    ➕ 함께 고민해볼 과목   
                   </div>
                   <div className="track-tier-cards">
                     {tier2.map(item => <CourseCard key={item.code} item={item} />)}

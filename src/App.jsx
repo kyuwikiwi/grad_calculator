@@ -55,7 +55,7 @@ export default function App() {
   const [settings, setSettings] = useState({
   studentId: '22',
   track: '일반',
-  subTrack: null,
+  subTrack: '선택 안 함',  // ← null에서 변경
 })
 
   return (
