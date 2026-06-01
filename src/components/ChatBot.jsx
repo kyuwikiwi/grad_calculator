@@ -274,7 +274,7 @@ export default function ChatBot({ studentId, track }) {
         ) : (
           <>
             <span className="chatbot__fab-emoji">🎓</span>
-            <span className="chatbot__fab-label">졸업 도우미</span>
+            <span className="chatbot__fab-label">그래</span>
           </>
         )}
       </button>

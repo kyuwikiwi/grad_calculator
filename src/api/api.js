@@ -36,6 +36,20 @@ export const login = async (username, password) => {
   return res.json()
 }
 
+export const changePassword = async (username, currentPassword, newPassword) => {
+  const res = await fetch(`${BASE}/auth/password`, {
+    method: 'PATCH',
+    headers: HEADERS,
+    body: JSON.stringify({
+      username,
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  })
+  if (!res.ok) throw new Error('비밀번호 변경 실패')
+  return res.json()
+}
+
 // ── 성적 ──────────────────────────────────────────────────
 
 export const parseFile = async (file) => {
@@ -59,14 +73,13 @@ export const getCourses = async (studentId) => {
   return res.json()
 }
 
-// 졸업요건 계산 — POST로 변경
 export const getGraduationResult = async (studentId, track, subTrack, excludedCourses = []) => {
   const body = {
     student_id: studentId,
     track: track || '기본',
+    excluded_courses: excludedCourses,
   }
   if (subTrack && subTrack !== '선택 안 함') body.sub_track = subTrack
-  if (excludedCourses.length > 0) body.excluded_courses = excludedCourses
 
   const res = await fetch(`${BASE}/graduation/result`, {
     method: 'POST',

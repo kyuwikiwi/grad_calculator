@@ -1292,3 +1292,28 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   text-align: center;
   padding: 8px 0;
 }
+
+/* ── 개인정보 동의 ── */
+.privacy-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.privacy-check {
+  font-size: 18px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.privacy-check--on { color: var(--accent); }
+.privacy-text {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* 모달 안에서만 간격 줄이기 */
+.modal-box .field-group {
+  margin-bottom: 12px;  /* 기존 28px → 12px */
+}
