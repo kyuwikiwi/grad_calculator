@@ -1,47 +1,49 @@
 // src/components/LoginModal.jsx
-// props:
-//   onLogin  : (user) => void
-//   onClose  : (() => void) | null  — null이면 닫기 버튼 숨김 (첫 화면)
 
 import { useState } from 'react'
+import { login, register } from '../api/api'
 
 export default function LoginModal({ onLogin, onClose }) {
-  const [studentId, setStudentId] = useState('')
+  const [mode,      setMode]      = useState('login') // 'login' | 'register'
+  const [username,  setUsername]  = useState('')
   const [password,  setPassword]  = useState('')
   const [error,     setError]     = useState('')
   const [loading,   setLoading]   = useState(false)
 
   const handleSubmit = async () => {
-    if (!studentId || !password) {
+    if (!username || !password) {
       setError('학번과 비밀번호를 입력해주세요.')
       return
     }
     setLoading(true)
     setError('')
 
-    // ── 백엔드 Auth API 연결 시 아래 주석 해제, setTimeout 블록 제거 ──
-    // try {
-    //   const res = await fetch(`${BASE}/auth/login`, {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ student_id: studentId, password }),
-    //   })
-    //   if (!res.ok) throw new Error()
-    //   const data = await res.json()
-    //   onLogin({ name: data.name, studentId })
-    // } catch {
-    //   setError('학번 또는 비밀번호가 올바르지 않아요.')
-    //   setLoading(false)
-    // }
-
-    setTimeout(() => {
-      if (studentId && password) {
-        onLogin({ name: studentId, studentId })
-      } else {
-        setError('학번 또는 비밀번호가 올바르지 않아요.')
+    try {
+      if (mode === 'register') {
+        // 회원가입
+        await register(username, password)
+        setMode('login')
+        setError('')
         setLoading(false)
+        return
       }
-    }, 800)
+
+      // 로그인
+      const data = await login(username, password)
+      // 토큰 저장
+      localStorage.setItem('token', data.access_token)
+      localStorage.setItem('user', JSON.stringify({ name: username, studentId: username }))
+      onLogin({ name: username, studentId: username })
+
+    } catch (e) {
+      setError(
+        mode === 'login'
+          ? '학번 또는 비밀번호가 올바르지 않아요.'
+          : '회원가입에 실패했어요. 다시 시도해주세요.'
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onKeyDown = (e) => {
@@ -49,13 +51,13 @@ export default function LoginModal({ onLogin, onClose }) {
   }
 
   return (
-    // onClose가 null이면 배경 클릭해도 안 닫힘
     <div className="modal-backdrop" onClick={onClose ?? undefined}>
       <div className="modal-box" onClick={e => e.stopPropagation()}>
 
         <div className="modal-header">
-          <h2 className="modal-title">로그인</h2>
-          {/* onClose가 있을 때만 닫기 버튼 표시 */}
+          <h2 className="modal-title">
+            {mode === 'login' ? '로그인' : '회원가입'}
+          </h2>
           {onClose && (
             <button className="modal-close" onClick={onClose}>✕</button>
           )}
@@ -67,9 +69,9 @@ export default function LoginModal({ onLogin, onClose }) {
             <input
               type="text"
               className="modal-input"
-              placeholder="학번을 입력하세요 (예: 2024245105)"
-              value={studentId}
-              onChange={e => { setStudentId(e.target.value); setError('') }}
+              placeholder="학번을 입력하세요"
+              value={username}
+              onChange={e => { setUsername(e.target.value); setError('') }}
               onKeyDown={onKeyDown}
               autoFocus
             />
@@ -88,20 +90,50 @@ export default function LoginModal({ onLogin, onClose }) {
           </div>
 
           {error && <p className="modal-error">{error}</p>}
+
+          {/* 회원가입 완료 안내 */}
+          {mode === 'register' && !error && !loading && (
+            <p style={{ fontSize: '12px', color: 'var(--text-2)' }}>
+              가입 후 로그인해주세요.
+            </p>
+          )}
         </div>
 
         <div className="modal-footer">
-          {onClose && (
-            <button className="btn-secondary" onClick={onClose}>취소</button>
-          )}
           <button
             className="btn-primary"
             onClick={handleSubmit}
             disabled={loading}
           >
-            {loading ? '로그인 중...' : '로그인'}
+            {loading
+              ? (mode === 'login' ? '로그인 중...' : '가입 중...')
+              : (mode === 'login' ? '로그인' : '회원가입')
+            }
           </button>
         </div>
+
+        {/* 모드 전환 */}
+        <p style={{ fontSize: '13px', color: 'var(--text-2)', textAlign: 'center', marginTop: '4px' }}>
+          {mode === 'login' ? (
+            <>계정이 없으신가요?{' '}
+              <button
+                style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit' }}
+                onClick={() => { setMode('register'); setError('') }}
+              >
+                회원가입
+              </button>
+            </>
+          ) : (
+            <>이미 계정이 있으신가요?{' '}
+              <button
+                style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontFamily: 'inherit' }}
+                onClick={() => { setMode('login'); setError('') }}
+              >
+                로그인
+              </button>
+            </>
+          )}
+        </p>
 
       </div>
     </div>

@@ -1193,3 +1193,102 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   line-height: 1.7;
   white-space: pre-wrap;
 }
+.track-course-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  transition: border-color .15s;
+  gap: 8px;
+}
+.track-course-card-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-1);
+  flex: 1;              /* ← 추가 */
+  white-space: nowrap;  /* ← 추가 */
+  overflow: hidden;     /* ← 추가 */
+  text-overflow: ellipsis; /* ← 추가 */
+}
+/* ── 심화 트랙 선택 ── */
+.subtrack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.subtrack-btn {
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.subtrack-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+.subtrack-btn--active {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── ExcludeModal ────────────────────────────────────────── */
+.modal-desc {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-top: -8px;
+}
+.exclude-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.exclude-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--bg);
+}
+.exclude-item:hover { border-color: var(--accent-dim); }
+.exclude-item--selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+.exclude-checkbox { font-size: 18px; color: var(--accent); flex-shrink: 0; }
+.exclude-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.exclude-name { font-size: 14px; font-weight: 500; color: var(--text-1); }
+.exclude-meta { font-size: 12px; color: var(--text-3); }
+.exclude-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--border);
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.exclude-badge--on {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+.exclude-hint {
+  font-size: 12px;
+  color: var(--text-2);
+  text-align: center;
+  padding: 8px 0;
+}

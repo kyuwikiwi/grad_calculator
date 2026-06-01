@@ -11,10 +11,14 @@ import './app.css'
 
 export default function App() {
   // ── 전역 state ──
-  const [user,            setUser]            = useState(null)
-  const [showLogin,       setShowLogin]       = useState(true)
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user')
+    return saved ? JSON.parse(saved) : null
+  })
+  const [showLogin, setShowLogin] = useState(() => {
+    return !localStorage.getItem('user')
+  })
 
-  const [settings,        setSettings]        = useState({ studentId: '22', track: '일반' })
   const [courses,         setCourses]         = useState([])
   const [result,          setResult]          = useState(null)
   const [step,            setStep]            = useState('settings')
@@ -33,10 +37,12 @@ export default function App() {
   }
 
   const handleLogout = () => {
-    setUser(null)
-    setShowLogin(true)
-    reset()
-  }
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  setUser(null)
+  setShowLogin(true)
+  reset()
+}
 
   const handleManualAdd = (newCourse) => {
     setCourses(prev => [...prev, newCourse])
@@ -45,6 +51,12 @@ export default function App() {
   const STEPS     = ['정보 입력', '성적 업로드', '결과 확인']
   const STEP_KEYS = ['settings', 'upload', 'result']
   const currentIdx = STEP_KEYS.indexOf(step)
+
+  const [settings, setSettings] = useState({
+  studentId: '22',
+  track: '일반',
+  subTrack: '선택 안 함',  // ← null에서 변경
+})
 
   return (
     <div className="app-root">

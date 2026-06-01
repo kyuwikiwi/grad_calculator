@@ -1,14 +1,23 @@
+// src/components/SettingsPanel.jsx
+
 const STUDENT_IDS = ['19', '20', '21', '22', '23']
-const TRACKS = [
-  { key: '일반', hint: '일반 졸업요건 적용' },
-  { key: '심화', hint: '심화 전공 졸업요건 적용' },
-]
+const TRACKS      = ['일반', '심화']
+const SUB_TRACKS  = ['선택 안 함', 'AI빅데이터', 'AI미디어', 'AI계산과학', '스마트IoT', '정보보안']
 
 export default function SettingsPanel({ settings, onChange, onNext }) {
   const update = (key, value) => onChange({ ...settings, [key]: value })
 
+  const handleTrackChange = (track) => {
+    onChange({
+      ...settings,
+      track,
+      subTrack: settings.subTrack || '선택 안 함',
+    })
+  }
+
   return (
     <div className="panel settings-panel">
+
       <div className="panel-hero">
         <h1 className="panel-title">안녕하세요 👋</h1>
         <p className="panel-desc">
@@ -17,6 +26,7 @@ export default function SettingsPanel({ settings, onChange, onNext }) {
         </p>
       </div>
 
+      {/* 학번 선택 */}
       <div className="field-group">
         <label className="field-label">학번</label>
         <div className="chip-row">
@@ -32,32 +42,57 @@ export default function SettingsPanel({ settings, onChange, onNext }) {
         </div>
       </div>
 
+      {/* 이수 과정 */}
       <div className="field-group">
         <label className="field-label">이수 과정</label>
         <div className="track-toggle">
           {TRACKS.map(t => (
             <button
-              key={t.key}
-              className={`track-btn ${settings.track === t.key ? 'track-btn--active' : ''}`}
-              onClick={() => update('track', t.key)}
+              key={t}
+              className={`track-btn ${settings.track === t ? 'track-btn--active' : ''}`}
+              onClick={() => handleTrackChange(t)}
             >
-              <span className="track-name">{t.key}과정</span>
-              <span className="track-hint">{t.hint}</span>
+              <span className="track-name">{t}과정</span>
+              <span className="track-hint">
+                {t === '일반' ? '일반 졸업요건 적용' : '심화 전공 졸업요건 적용'}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
+      {/* 트랙 선택 — 항상 표시 */}
+      <div className="field-group">
+        <label className="field-label">트랙 선택</label>
+        <div className="subtrack-list">
+          {SUB_TRACKS.map(t => (
+            <button
+              key={t}
+              className={`subtrack-btn ${(settings.subTrack || '선택 안 함') === t ? 'subtrack-btn--active' : ''}`}
+              onClick={() => update('subTrack', t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 선택 요약 */}
       <div className="summary-box">
-        <span>📋</span>
+        <span className="summary-icon">📋</span>
         <span className="summary-text">
-          <strong>{settings.studentId}학번</strong> · <strong>{settings.track}과정</strong> 기준으로 계산합니다
+          <strong>{settings.studentId}학번</strong> · <strong>{settings.track}과정</strong>
+          {settings.subTrack && settings.subTrack !== '선택 안 함' && (
+            <> · <strong>{settings.subTrack} 트랙</strong></>
+          )}
+          {' '}기준으로 계산합니다
         </span>
       </div>
 
       <button className="btn-primary" onClick={onNext}>
         성적표 업로드하기 →
       </button>
+
     </div>
   )
 }
