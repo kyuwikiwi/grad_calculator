@@ -66,8 +66,7 @@ export const getGraduationResult = async (studentId, track, subTrack, excludedCo
     track: track || '기본',
   }
   if (subTrack && subTrack !== '선택 안 함') body.sub_track = subTrack
-  if (excludedCourses.length > 0) body.excluded_courses = excludedCourses
-
+  body.excluded_courses = excludedCourses
   const res = await fetch(`${BASE}/graduation/result`, {
     method: 'POST',
     headers: HEADERS,

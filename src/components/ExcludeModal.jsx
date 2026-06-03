@@ -60,7 +60,10 @@ export default function ExcludeModal({ commonCourses, excluded, onConfirm, onClo
 
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onClose}>취소</button>
-          <button className="btn-primary modal-submit" onClick={() => onConfirm([...selected])}>
+          <button className="btn-primary modal-submit" onClick={() => {
+            console.log('selected:', [...selected])  // ← 추가
+            onConfirm([...selected])
+          }}>
             적용하기
           </button>
         </div>

@@ -1,28 +1,27 @@
 // src/components/ResultDashboard.jsx
 
-import { useEffect, useState } from 'react'
-import { getGraduationResult, getCourses } from '../api/api'
+import { useEffect, useState, useRef } from 'react'
+import { getGraduationResult } from '../api/api'
 import TrackGuide from './TrackGuide'
 import ExcludeModal from './ExcludeModal'
 
-// 기본전공 + 심화전공 공통 과목 코드 (DB 기준)
 const COMMON_CODES = [
-  { course_code: 'SWE3013', course_name: '소프트웨어공학',     credits: 3 },
-  { course_code: 'SWE3016', course_name: '인공지능',           credits: 3 },
-  { course_code: 'SWE3017', course_name: '데이터베이스',        credits: 3 },
-  { course_code: 'SWE3018', course_name: '데이터마이닝',        credits: 3 },
-  { course_code: 'SWE3019', course_name: '디지털신호처리',      credits: 3 },
-  { course_code: 'SWE3020', course_name: '수치해석과최적화',    credits: 3 },
-  { course_code: 'SWE3022', course_name: '임베디드시스템',      credits: 3 },
-  { course_code: 'SWE3023', course_name: '컴퓨터네트워크',     credits: 3 },
-  { course_code: 'SWE3024', course_name: '정보보안',            credits: 3 },
-  { course_code: 'SWE4002', course_name: '웹서비스응용',        credits: 3 },
+  { course_code: 'SWE3013', course_name: '소프트웨어공학',      credits: 3 },
+  { course_code: 'SWE3016', course_name: '인공지능',            credits: 3 },
+  { course_code: 'SWE3017', course_name: '데이터베이스',         credits: 3 },
+  { course_code: 'SWE3018', course_name: '데이터마이닝',         credits: 3 },
+  { course_code: 'SWE3019', course_name: '디지털신호처리',       credits: 3 },
+  { course_code: 'SWE3020', course_name: '수치해석과최적화',     credits: 3 },
+  { course_code: 'SWE3022', course_name: '임베디드시스템',       credits: 3 },
+  { course_code: 'SWE3023', course_name: '컴퓨터네트워크',      credits: 3 },
+  { course_code: 'SWE3024', course_name: '정보보안',             credits: 3 },
+  { course_code: 'SWE4002', course_name: '웹서비스응용',         credits: 3 },
   { course_code: 'SWE4027', course_name: 'SW엔지니어소양세미나', credits: 1 },
-  { course_code: 'SWE4028', course_name: '융합캡스톤디자인',    credits: 2 },
-  { course_code: 'SWE4029', course_name: 'SW인턴십(1)',         credits: 1 },
-  { course_code: 'SWE4030', course_name: 'SW인턴십(2)',         credits: 1 },
-  { course_code: 'SWE4031', course_name: 'SW인턴십(3)',         credits: 1 },
-  { course_code: 'SWE4032', course_name: 'SW인턴십(4)',         credits: 1 },
+  { course_code: 'SWE4028', course_name: '융합캡스톤디자인',     credits: 2 },
+  { course_code: 'SWE4029', course_name: 'SW인턴십(1)',          credits: 1 },
+  { course_code: 'SWE4030', course_name: 'SW인턴십(2)',          credits: 1 },
+  { course_code: 'SWE4031', course_name: 'SW인턴십(3)',          credits: 1 },
+  { course_code: 'SWE4032', course_name: 'SW인턴십(4)',          credits: 1 },
 ]
 
 function barColor(pct) {
@@ -62,11 +61,14 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
   const [excludedCourses, setExcludedCourses] = useState([])
   const [showExclude,     setShowExclude]     = useState(false)
 
-  // 학생이 실제 이수한 공통 과목만 필터링
+  // ref로 최신 excludedCourses 값 유지 (클로저 문제 해결)
+  const excludedRef = useRef([])
+
   const completedCodes  = new Set((courses || []).map(c => c.course_code))
   const availableCommon = COMMON_CODES.filter(c => completedCodes.has(c.course_code))
 
-  const load = async (excluded = excludedCourses) => {
+  const fetchResult = async (excluded) => {
+    console.log('fetchResult 호출됨, excluded:', excluded)
     setLoading(true)
     setError(null)
     try {
@@ -85,13 +87,17 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
   }
 
   useEffect(() => {
-    load()
+    excludedRef.current = []
+    setExcludedCourses([])
+    fetchResult([])
   }, [courses, settings])
 
   const handleExcludeConfirm = (codes) => {
+    console.log('handleExcludeConfirm 호출됨:', codes) 
+    excludedRef.current = codes
     setExcludedCourses(codes)
     setShowExclude(false)
-    load(codes)
+    fetchResult(codes)
   }
 
   if (loading) {

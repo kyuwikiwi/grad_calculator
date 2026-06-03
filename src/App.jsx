@@ -152,14 +152,13 @@ export default function App() {
                   studentId: parsedStudentId || settings.studentId,
                 }}
                 onReset={reset}
-                onManualAdd={() => setStep('manual')}
-              />
-            )}
-
-            {step === 'manual' && (
-              <ManualAddScreen
-                onAdd={handleManualAdd}
-                onBack={() => setStep('result')}
+                onManualAdd={(course) => {
+                  if (course && course.course_name) {
+                    handleManualAdd(course)
+                  } else {
+                    setStep('manual')
+                  }
+                }}
               />
             )}
           </>
