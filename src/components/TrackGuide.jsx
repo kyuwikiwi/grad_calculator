@@ -123,8 +123,7 @@ export default function TrackGuide({ courses, settings, onAddCourse }) {
     )
   }
 
-  // 일반과정이면 표시 안 함
-  if (settings?.track !== '심화') return null
+
 
   return (
     <div className="panel track-guide-panel">

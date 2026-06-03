@@ -7,6 +7,8 @@ import ResultDashboard  from './components/ResultDashboard'
 import ManualAddScreen  from './components/ManualAddScreen'
 import LoginModal       from './components/LoginModal'
 import ChatBot          from './components/ChatBot'
+import RegisterModal from './components/RegisterModal'
+import PasswordModal from './components/PasswordModal.jsx'
 import './app.css'
 
 export default function App() {
@@ -57,6 +59,8 @@ export default function App() {
   track: '일반',
   subTrack: '선택 안 함',  // ← null에서 변경
 })
+  const [showRegister, setShowRegister]= useState(false)
+  const [showPassword, setShowPassword]= useState(false)
 
   return (
     <div className="app-root">
@@ -65,8 +69,8 @@ export default function App() {
       <header className="app-header">
         <div className="header-inner">
           <div className="header-logo">
-            <span className="logo-mark">✦</span>
-            <span className="logo-text">졸업요건 계산기</span>
+            <span className="logo-mark">🎓</span>
+            <span className="logo-text">Gradulator</span>
             <span className="logo-divider">|</span>
             <span className="logo-sub">소프트웨어학부</span>
           </div>
@@ -75,6 +79,7 @@ export default function App() {
               <>
                 <span className="user-label">{user.name}님 환영합니다!</span>
                 <div className="user-avatar">{user.name[0]}</div>
+                <button className="btn-logout" onClick={() => setShowPassword(true)}>설정</button>
                 <button className="btn-logout" onClick={handleLogout}>로그아웃</button>
               </>
             ) : (
@@ -171,13 +176,32 @@ export default function App() {
         <LoginModal
           onLogin={handleLogin}
           onClose={user ? () => setShowLogin(false) : null}
+          onShowRegister={() => { setShowLogin(false); setShowRegister(true) }}
         />
+      )}
+
+      {/*--모달 추가--- */}
+      {showRegister &&(
+      <RegisterModal 
+        onClose={()=> setShowRegister(false)}
+        onShowLogin={() => {setShowRegister(false); setShowLogin(true)}}
+      />
       )}
 
       {/* ── 챗봇 (로그인 후에만 표시) ── */}
       {user && (
         <ChatBot studentId={settings.studentId} track={settings.track} />
       )}
+
+      {/*---비번 변경--- */}
+      {showPassword && (
+        <PasswordModal
+          user={user}
+          onClose={() => setShowPassword(false)}
+        />
+      )}
+
+      
 
     </div>
   )
