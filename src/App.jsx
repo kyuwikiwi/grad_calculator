@@ -1,14 +1,14 @@
 // src/App.jsx
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import SettingsPanel    from './components/SettingsPanel'
 import UploadPanel      from './components/UploadPanel'
 import ResultDashboard  from './components/ResultDashboard'
 import ManualAddScreen  from './components/ManualAddScreen'
 import LoginModal       from './components/LoginModal'
+import RegisterModal    from './components/RegisterModal'
+import PasswordModal    from './components/PasswordModal'
 import ChatBot          from './components/ChatBot'
-import RegisterModal from './components/RegisterModal'
-import PasswordModal from './components/PasswordModal.jsx'
 import './app.css'
 
 export default function App() {
@@ -17,14 +17,25 @@ export default function App() {
     const saved = localStorage.getItem('user')
     return saved ? JSON.parse(saved) : null
   })
-  const [showLogin, setShowLogin] = useState(() => {
-    return !localStorage.getItem('user')
-  })
+  const [showLogin,    setShowLogin]    = useState(() => !localStorage.getItem('user'))
+  const [showRegister, setShowRegister] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
+  const [settings, setSettings] = useState({
+    studentId: '22',
+    track:     '일반',
+    subTrack:  '선택 안 함',
+  })
   const [courses,         setCourses]         = useState([])
   const [result,          setResult]          = useState(null)
   const [step,            setStep]            = useState('settings')
-  const [parsedStudentId, setParsedStudentId] = useState(null) // 파싱된 실제 학번
+  const [parsedStudentId, setParsedStudentId] = useState(null)
+
+  // settings 새 객체 생성 방지 → useEffect 불필요한 재실행 방지
+  const mergedSettings = useMemo(() => ({
+    ...settings,
+    studentId: parsedStudentId || settings.studentId,
+  }), [settings, parsedStudentId])
 
   const reset = () => {
     setCourses([])
@@ -39,12 +50,12 @@ export default function App() {
   }
 
   const handleLogout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
-  setUser(null)
-  setShowLogin(true)
-  reset()
-}
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
+    setShowLogin(true)
+    reset()
+  }
 
   const handleManualAdd = (newCourse) => {
     setCourses(prev => [...prev, newCourse])
@@ -54,21 +65,17 @@ export default function App() {
   const STEP_KEYS = ['settings', 'upload', 'result']
   const currentIdx = STEP_KEYS.indexOf(step)
 
-  const [settings, setSettings] = useState({
-  studentId: '22',
-  track: '일반',
-  subTrack: '선택 안 함',  // ← null에서 변경
-})
-  const [showRegister, setShowRegister]= useState(false)
-  const [showPassword, setShowPassword]= useState(false)
-
   return (
     <div className="app-root">
 
       {/* ── Header ── */}
       <header className="app-header">
         <div className="header-inner">
-          <div className="header-logo">
+          <div
+            className="header-logo"
+            onClick={reset}
+            style={{ cursor: 'pointer' }}
+          >
             <span className="logo-mark">🎓</span>
             <span className="logo-text">Gradulator</span>
             <span className="logo-divider">|</span>
@@ -140,7 +147,6 @@ export default function App() {
                 settings={settings}
                 onParsed={(parsed) => {
                   setCourses(parsed)
-                  // 파싱된 실제 student_id 저장
                   const sid = parsed?.[0]?.student_id ?? null
                   setParsedStudentId(sid)
                   setResult({ _calculated: true })
@@ -152,10 +158,7 @@ export default function App() {
             {step === 'result' && (
               <ResultDashboard
                 courses={courses}
-                settings={{
-                  ...settings,
-                  studentId: parsedStudentId || settings.studentId,
-                }}
+                settings={mergedSettings}
                 onReset={reset}
                 onManualAdd={(course) => {
                   if (course && course.course_name) {
@@ -164,6 +167,13 @@ export default function App() {
                     setStep('manual')
                   }
                 }}
+              />
+            )}
+
+            {step === 'manual' && (
+              <ManualAddScreen
+                onAdd={handleManualAdd}
+                onBack={() => setStep('result')}
               />
             )}
           </>
@@ -180,20 +190,15 @@ export default function App() {
         />
       )}
 
-      {/*--모달 추가--- */}
-      {showRegister &&(
-      <RegisterModal 
-        onClose={()=> setShowRegister(false)}
-        onShowLogin={() => {setShowRegister(false); setShowLogin(true)}}
-      />
+      {/* ── 회원가입 모달 ── */}
+      {showRegister && (
+        <RegisterModal
+          onClose={() => setShowRegister(false)}
+          onShowLogin={() => { setShowRegister(false); setShowLogin(true) }}
+        />
       )}
 
-      {/* ── 챗봇 (로그인 후에만 표시) ── */}
-      {user && (
-        <ChatBot studentId={settings.studentId} track={settings.track} />
-      )}
-
-      {/*---비번 변경--- */}
+      {/* ── 비밀번호 변경 모달 ── */}
       {showPassword && (
         <PasswordModal
           user={user}
@@ -201,7 +206,10 @@ export default function App() {
         />
       )}
 
-      
+      {/* ── 챗봇 (로그인 후에만 표시) ── */}
+      {user && (
+        <ChatBot studentId={mergedSettings.studentId} track={settings.track} />
+      )}
 
     </div>
   )

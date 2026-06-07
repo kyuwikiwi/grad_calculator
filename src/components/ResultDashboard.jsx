@@ -87,10 +87,9 @@ export default function ResultDashboard({ courses, settings, onReset, onManualAd
   }
 
   useEffect(() => {
-    excludedRef.current = []
-    setExcludedCourses([])
-    fetchResult([])
-  }, [courses, settings])
+    console.log('useEffect 실행됨, excludedRef:', excludedRef.current)
+    fetchResult(excludedRef.current)
+  }, [settings])
 
   const handleExcludeConfirm = (codes) => {
     console.log('handleExcludeConfirm 호출됨:', codes) 
