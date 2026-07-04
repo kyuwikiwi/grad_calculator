@@ -43,48 +43,48 @@ src/
 ## 3. Preview
 
 ### 3.1 로그인
-![로그인](./preview/login.png)
+<img width="842" alt="login" src="https://github.com/user-attachments/assets/dff13f23-11b7-432d-916b-8a6e7750b0c7" />
 
 ### 3.2 회원가입
-![회원가입](./preview/register.png)
+<img width="927" alt="register" src="https://github.com/user-attachments/assets/8f7913e6-faa0-461b-b8fd-1456d2e7e4ee" />
 
 ### 3.3 정보 입력
-![정보입력](./preview/input.png)
+<img width="840" alt="input" src="https://github.com/user-attachments/assets/a170e305-9378-48aa-9b2f-834a96f5fa91" />
 
 ### 3.4 성적표 업로드
-![성적표업로드](./preview/upload.png)
+<img width="1918" alt="upload" src="https://github.com/user-attachments/assets/a94c2576-e265-431f-8e88-479456bdfb98" />
 
 ### 3.5 일반과정 결과
-![일반결과](./preview/result1.png)
+<img width="1918" alt="result1" src="https://github.com/user-attachments/assets/c62c0d62-3a46-4b5b-96d6-061eb7dce738" />
 
 ### 3.6 심화과정 결과
-![심화결과](./preview/result2.png)
+<img width="947" alt="result2" src="https://github.com/user-attachments/assets/0f15af4e-6f57-4a14-8c47-c5820fdc0559" />
 
 ### 3.7 1전공 과목 선택 (선택 전)
-![1과목선택전](./preview/select1.png)
+<img width="557" alt="select1" src="https://github.com/user-attachments/assets/88d55bf6-6b54-4d29-9e8a-4db893acf02c" />
 
 ### 3.8 1전공 과목 선택 (선택 후)
-![1과목선택후](./preview/select.png)
+<img width="550" alt="select" src="https://github.com/user-attachments/assets/98f448c4-0a73-4abb-aced-b176ea0b0969" />
 
 ### 3.9 심화 결과 변경
-![심화결과변경](./preview/changedresul.png)
+<img width="907" alt="changedresult" src="https://github.com/user-attachments/assets/4ce3fa4f-05ea-46e8-b903-0ee65896b934" />
 
 ### 3.10 AI 선배 추천 과목
-![AI선배추천](./preview/recommendation.png)
+<img width="880" alt="recommendation" src="https://github.com/user-attachments/assets/09c6b38d-ca35-446e-b6ad-c11feb03cf84" />
 
 ### 3.11 수강 중인 과목 추가
-![수강과목추가](./preview/add.png)
+<img width="842" alt="add" src="https://github.com/user-attachments/assets/dff13f23-11b7-432d-916b-8a6e7750b0c7" />
 
 ### 3.12 챗봇 그래
-![챗봇](./preview/chatbot.png)
+<img width="481" alt="chatbot" src="https://github.com/user-attachments/assets/16a2e6aa-765a-4542-87d3-3b8d2b3804a6" />
 
 ### 3.13 챗봇 대화
-![챗봇2](./preview/chatbot2.png)
+<img width="487" alt="chatbot2" src="https://github.com/user-attachments/assets/fccbed09-0037-4476-9c2e-89239cd570cc" />
 
-![챗봇3](./preview/chatbot3.png)
+<img width="481" alt="chatbot3" src="https://github.com/user-attachments/assets/77cde8fa-76aa-4fdb-8b5b-5d5b3d3efd56" />
 
 ### 3.14 비밀번호 변경
-![비밀번호변경](./preview/changepw.png)
+<img width="840" alt="changepw" src="https://github.com/user-attachments/assets/a170e305-9378-48aa-9b2f-834a96f5fa91" />
 
 ---
 
