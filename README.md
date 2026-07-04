@@ -43,47 +43,48 @@ src/
 ## 3. Preview
 
 ### 3.1 로그인
-![로그인](./preview/로그인.png)
+![로그인](./preview/login.png)
 
 ### 3.2 회원가입
-![회원가입](./preview/회원가입.png)
+![회원가입](./preview/register.png)
 
 ### 3.3 정보 입력
-![정보입력](./preview/정보입력.png)
+![정보입력](./preview/input.png)
 
 ### 3.4 성적표 업로드
-![성적표업로드](./preview/성적표업로드.png)
+![성적표업로드](./preview/upload.png)
 
 ### 3.5 일반과정 결과
-![일반결과](./preview/일반결과ㅓ.png)
+![일반결과](./preview/result1.png)
 
 ### 3.6 심화과정 결과
-![심화결과](./preview/심화1.png)
+![심화결과](./preview/result2.png)
 
 ### 3.7 1전공 과목 선택 (선택 전)
-![1과목선택전](./preview/심화1과목선택.png)
+![1과목선택전](./preview/select1.png)
 
 ### 3.8 1전공 과목 선택 (선택 후)
-![1과목선택후](./preview/1과목선택.png)
+![1과목선택후](./preview/select.png)
 
-### 3.9 심화결과 변경
-![심화결과변경](./preview/심화결과_변경.png)
+### 3.9 심화 결과 변경
+![심화결과변경](./preview/changedresul.png)
 
 ### 3.10 AI 선배 추천 과목
-![AI선배추천](./preview/AI선배추천.png)
+![AI선배추천](./preview/recommendation.png)
 
 ### 3.11 수강 중인 과목 추가
-![수강과목추가](./preview/수강과목추가.png)
+![수강과목추가](./preview/add.png)
 
 ### 3.12 챗봇 그래
-![챗봇](./preview/그래_챗봇.png)
+![챗봇](./preview/chatbot.png)
 
 ### 3.13 챗봇 대화
-![챗봇2](./preview/챗봇2.png)
-![챗봇3](./preview/챗봇3.png)
+![챗봇2](./preview/chatbot2.png)
+
+![챗봇3](./preview/chatbot3.png)
 
 ### 3.14 비밀번호 변경
-![비밀번호변경](./preview/비밀번호변경.png)
+![비밀번호변경](./preview/changepw.png)
 
 ---
 
